@@ -1,0 +1,168 @@
+<!doctype html>
+<!-- Source for the social-sharing images and home-screen icons.
+     Serve the project root (python3 -m http.server 8790), open /docs/og/og-images.html
+     and screenshot each [data-out] element at its own size. See README "Sharing previews". -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>OG image sources</title>
+<style>
+  @font-face { font-family: "Figtree"; font-weight: 400 900; src: url("../../assets/fonts/figtree-var.woff2") format("woff2"); }
+  @font-face { font-family: "Newsreader"; font-weight: 500; src: url("../../assets/fonts/newsreader-500.woff2") format("woff2"); }
+  @font-face { font-family: "DM Sans"; font-weight: 400 600; src: url("../../assets/fonts/dmsans-var.woff2") format("woff2"); }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px; background: #888; display: grid; gap: 24px; justify-content: start; }
+  p, h1, h2 { margin: 0; }
+  .frame { position: relative; width: 1200px; height: 630px; overflow: hidden; }
+  svg { display: block; }
+
+  /* ---------- Option A: navy ---------- */
+  #og-navy { background: #0b2440; font-family: "Figtree", sans-serif; color: #fff; }
+  #og-navy .photo { position: absolute; inset: 0 0 0 auto; width: 70%; height: 100%; object-fit: cover; object-position: 50% 45%; }
+  #og-navy::before {
+    content: ""; position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(90deg, #0b2440 0%, #0b2440 34%, rgb(11 36 64 / .88) 48%, rgb(11 36 64 / .35) 68%, rgb(11 36 64 / 0) 84%);
+  }
+  #og-navy .content { position: relative; z-index: 2; display: flex; flex-direction: column; height: 100%; padding: 58px 64px 56px; }
+  #og-navy .brand { display: flex; align-items: center; gap: 16px; }
+  #og-navy .brand svg { width: 92px; }
+  #og-navy .brand strong { display: block; font-size: 40px; font-weight: 800; line-height: 1; letter-spacing: -.01em; }
+  #og-navy .brand small { display: block; margin-top: 7px; font-size: 13px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+  #og-navy .eyebrow { margin-top: auto; font-size: 20px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #ff8b3d; }
+  #og-navy h1 { margin-top: 14px; font-size: 88px; font-weight: 800; line-height: .96; letter-spacing: -.04em; }
+  #og-navy .foot { display: flex; align-items: center; gap: 28px; margin-top: 34px; }
+  #og-navy .phone { display: flex; align-items: center; gap: 14px; padding-bottom: 8px; font-size: 40px; font-weight: 800; border-bottom: 5px solid #f25a1a; }
+  #og-navy .phone svg { width: 34px; height: 34px; }
+  #og-navy .chips { font-size: 21px; font-weight: 600; color: rgb(255 255 255 / .9); }
+  #og-navy .bar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; height: 10px; background: #f25a1a; }
+
+  /* ---------- Option B: green ---------- */
+  #og-green { background: #f8f7f1; font-family: "DM Sans", sans-serif; color: #2b3a34; }
+  #og-green .photo {
+    position: absolute; top: 0; right: 0; width: 50%; height: 100%;
+    object-fit: cover; object-position: 50% 45%;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 12% 100%);
+  }
+  #og-green .content { position: relative; display: flex; flex-direction: column; width: 58%; height: 100%; padding: 56px 0 0 64px; }
+  #og-green .brand { display: flex; align-items: center; gap: 18px; color: #0e2a22; }
+  #og-green .brand svg { width: 72px; height: 72px; overflow: visible; }
+  #og-green .brand span { padding-left: 18px; border-left: 1.5px solid #b9c4b8; }
+  #og-green .brand strong { display: block; font-family: "Newsreader", serif; font-size: 38px; font-weight: 500; line-height: 1; }
+  #og-green .brand small { display: block; margin-top: 8px; font-size: 13px; font-weight: 500; letter-spacing: .15em; text-transform: uppercase; }
+  #og-green .eyebrow { margin-top: 62px; font-size: 18px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: #2f6b4f; }
+  #og-green h1 { margin-top: 14px; font-family: "Newsreader", serif; font-size: 80px; font-weight: 500; line-height: .98; letter-spacing: -.03em; color: #0e2a22; }
+  #og-green .lead { margin-top: 20px; font-size: 25px; line-height: 1.35; max-width: 470px; }
+  #og-green .band {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 74px; z-index: 2;
+    display: flex; align-items: center; gap: 40px; padding: 0 64px;
+    background: #154d3f; color: #fff; font-size: 22px;
+  }
+  #og-green .band .phone { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 28px; }
+  #og-green .band .phone svg { width: 26px; height: 26px; }
+  #og-green .band .sep { width: 1px; height: 30px; background: rgb(255 255 255 / .3); }
+
+  /* ---------- Chooser ---------- */
+  #og-chooser { background: #f4f2ec; font-family: "Figtree", sans-serif; color: #16201c; }
+  #og-chooser .head { position: absolute; top: 50px; left: 0; right: 0; text-align: center; }
+  #og-chooser .eyebrow { font-size: 18px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: #6b726e; }
+  #og-chooser h1 { margin-top: 10px; font-size: 58px; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
+  #og-chooser .sub { margin-top: 12px; font-size: 24px; color: #3d4642; }
+  #og-chooser .shots { position: absolute; left: 0; right: 0; top: 262px; display: flex; justify-content: center; gap: 36px; }
+  #og-chooser .shot { position: relative; width: 500px; }
+  #og-chooser .shot img {
+    display: block; width: 100%; height: 330px; object-fit: cover; object-position: top;
+    border-radius: 12px 12px 0 0; box-shadow: 0 14px 40px rgb(22 32 28 / .22);
+  }
+  #og-chooser .tag {
+    position: absolute; top: -16px; left: 20px; z-index: 1;
+    padding: 6px 16px; border-radius: 99px;
+    font-size: 17px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: #fff;
+  }
+
+  /* ---------- Home-screen icons (iOS rounds the corners itself) ---------- */
+  .icon { position: relative; width: 180px; height: 180px; display: grid; place-items: center; }
+  #icon-navy { background: #0f2e4b; }
+  #icon-navy svg { width: 132px; }
+  #icon-green { background: #f8f7f1; }
+  #icon-green svg { width: 124px; height: 124px; overflow: visible; }
+</style>
+</head>
+<body>
+
+<!-- Option A -->
+<section class="frame" id="og-navy" data-out="navy/og-image.jpg">
+  <img class="photo" src="../../assets/img/hero-lawn-1500.webp" alt="">
+  <div class="content">
+    <div class="brand">
+      <svg viewBox="0 0 132 64"><g fill="#f25a1a"><path d="M0 64 31 0h16l15 31-9 18-14-28-20 43Z"/><path d="m30 64 9-19 9 19Z"/><path d="M53 0h77l-9 14H60Z"/><path d="M100 14h21L84 50H63Z"/><path d="M58 50h74l-7 14H51Z"/></g></svg>
+      <span><strong>A To Z</strong><small>Home Improvement Ltd</small></span>
+    </div>
+    <p class="eyebrow">Garden services in Harrow</p>
+    <h1>Less garden work.<br>More weekend.</h1>
+    <div class="foot">
+      <p class="phone"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1l-2.2 2.23Z"/></svg>07424 940579</p>
+      <p class="chips">Free estimates · Domestic &amp; commercial</p>
+    </div>
+  </div>
+  <div class="bar"></div>
+</section>
+
+<!-- Option B -->
+<section class="frame" id="og-green" data-out="green/og-image.jpg">
+  <img class="photo" src="../../assets/img/hero-lawn-1500.webp" alt="">
+  <div class="content">
+    <div class="brand">
+      <svg viewBox="0 0 64 64">
+        <text x="-1" y="37" font-family="Newsreader, Georgia, serif" font-weight="500" font-size="42" fill="#0e2a22">A</text>
+        <text x="29" y="63" font-family="Newsreader, Georgia, serif" font-weight="500" font-size="42" fill="#0e2a22">Z</text>
+        <path d="M17 61C24 44 33 26 51 5" fill="none" stroke="#2f6b4f" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M38 29c-3-12 3-21 17-27 3 13-3 22-17 27Z" fill="#b7d3a2"/>
+        <path d="M29 39c-9-1-14-8-13-18 9 2 14 9 13 18Z" fill="#8db57a"/>
+        <path d="M26 47c4-9 13-13 23-11-4 9-13 13-23 11Z" fill="#2f6b4f"/>
+      </svg>
+      <span><strong>A To Z</strong><small>Home Improvement Ltd</small></span>
+    </div>
+    <p class="eyebrow">Local garden care</p>
+    <h1>A garden you<br>can enjoy again.</h1>
+    <p class="lead">Garden maintenance, clearance and lawn care in Harrow, London.</p>
+  </div>
+  <div class="band">
+    <p class="phone"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1l-2.2 2.23Z"/></svg>07424 940579</p>
+    <span class="sep"></span>
+    <p>Free estimates</p>
+    <span class="sep"></span>
+    <p>Domestic &amp; commercial</p>
+  </div>
+</section>
+
+<!-- Chooser -->
+<section class="frame" id="og-chooser" data-out="assets/img/og-image.jpg">
+  <div class="head">
+    <p class="eyebrow">Website preview</p>
+    <h1>A To Z Home Improvement</h1>
+    <p class="sub">Two designs for your new garden care website</p>
+  </div>
+  <div class="shots">
+    <div class="shot"><span class="tag" style="background:#f25a1a">Option A</span><img src="../../assets/img/preview-navy-desktop-1100.webp" alt=""></div>
+    <div class="shot"><span class="tag" style="background:#154d3f">Option B</span><img src="../../assets/img/preview-green-desktop-1100.webp" alt=""></div>
+  </div>
+</section>
+
+<!-- Home-screen icons -->
+<div class="icon" id="icon-navy" data-out="navy/apple-touch-icon.png">
+  <svg viewBox="0 0 132 64"><g fill="#f25a1a"><path d="M0 64 31 0h16l15 31-9 18-14-28-20 43Z"/><path d="m30 64 9-19 9 19Z"/><path d="M53 0h77l-9 14H60Z"/><path d="M100 14h21L84 50H63Z"/><path d="M58 50h74l-7 14H51Z"/></g></svg>
+</div>
+<div class="icon" id="icon-green" data-out="green/apple-touch-icon.png">
+  <svg viewBox="0 0 64 64">
+    <text x="-1" y="37" font-family="Newsreader, Georgia, serif" font-weight="500" font-size="42" fill="#0e2a22">A</text>
+    <text x="29" y="63" font-family="Newsreader, Georgia, serif" font-weight="500" font-size="42" fill="#0e2a22">Z</text>
+    <path d="M17 61C24 44 33 26 51 5" fill="none" stroke="#2f6b4f" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M38 29c-3-12 3-21 17-27 3 13-3 22-17 27Z" fill="#b7d3a2"/>
+    <path d="M29 39c-9-1-14-8-13-18 9 2 14 9 13 18Z" fill="#8db57a"/>
+    <path d="M26 47c4-9 13-13 23-11-4 9-13 13-23 11Z" fill="#2f6b4f"/>
+  </svg>
+</div>
+
+</body>
+</html>
