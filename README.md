@@ -1,6 +1,6 @@
 # A To Z Home Improvement: garden care landing page
 
-The selected green-and-cream landing page (HTML/CSS/JS, no build step) for Nicolae Chiric, A To Z Home Improvement Ltd, garden care in Harrow. The homepage now uses the supplied London hero artwork, with forest green, cream and gold styling.
+The selected green-and-cream landing page (HTML/CSS/JS, no build step) for Nicolae Chiric, A To Z Home Improvement Ltd, garden care in Harrow. The homepage keeps the original green-and-cream design, with the supplied London artwork replacing the hero photo.
 
 Live preview: https://atoz-home-improvementl.vercel.app (Vercel deploys every push to `main`)
 
@@ -46,7 +46,7 @@ The pages have 1200×630 sharing images and full Open Graph and Twitter tags wit
 | `/green/` | `green/og-image.jpg` | Same selected design as `/` |
 
 - The images are designed in `docs/og/og-images.html` using the real fonts and logos. To change one, edit that page, serve the project root, screenshot each `[data-out]` element at 1200×630 (icons at 180×180), and save it as JPEG (quality ~84) to the path in its `data-out` attribute. Keep each image under 300 KB so WhatsApp shows it.
-- The selected design's image URLs end in `?v=3`; the navy preview uses `?v=2`. WhatsApp caches previews per URL, so after changing an image, bump the number in the pages using it.
+- The selected design's image URLs end in `?v=4`; the navy preview uses `?v=2`. WhatsApp caches previews per URL, so after changing an image, bump the number in the pages using it.
 - All URLs use `https://atoz-home-improvementl.vercel.app`. If the site moves to a custom domain, find and replace that address across the three `index.html` files.
 
 ## Before launch

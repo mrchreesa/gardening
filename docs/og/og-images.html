@@ -38,31 +38,29 @@
   #og-navy .bar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; height: 10px; background: #f25a1a; }
 
   /* ---------- Selected green landing page ---------- */
-  #og-green { background: #0c2e25; font-family: "DM Sans", sans-serif; color: #d0ddd3; }
+  #og-green { background: #f8f7f1; font-family: "DM Sans", sans-serif; color: #2b3a34; }
   #og-green .photo {
-    position: absolute; top: 86px; right: 38px; width: 580px; height: auto;
-    padding: 10px; border: 1px solid #827955;
-    box-shadow: 0 24px 60px rgb(0 15 10 / .24);
+    position: absolute; top: 0; right: 0; width: 50%; height: 100%;
+    object-fit: cover; object-position: 50% 45%;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 12% 100%);
   }
-  #og-green .content { position: relative; display: flex; flex-direction: column; width: 530px; height: 100%; padding: 48px 0 0 48px; }
-  #og-green .brand { display: flex; align-items: center; gap: 18px; color: #f8f7f1; }
-  #og-green .brand svg { width: 62px; height: 62px; overflow: visible; }
-  #og-green .brand svg text { fill: #f8f7f1; }
+  #og-green .content { position: relative; display: flex; flex-direction: column; width: 58%; height: 100%; padding: 56px 0 0 64px; }
+  #og-green .brand { display: flex; align-items: center; gap: 18px; color: #0e2a22; }
+  #og-green .brand svg { width: 72px; height: 72px; overflow: visible; }
   #og-green .brand span { padding-left: 18px; border-left: 1.5px solid #b9c4b8; }
   #og-green .brand strong { display: block; font-family: "Newsreader", serif; font-size: 38px; font-weight: 500; line-height: 1; }
   #og-green .brand small { display: block; margin-top: 8px; font-size: 13px; font-weight: 500; letter-spacing: .15em; text-transform: uppercase; }
-  #og-green .eyebrow { margin-top: 36px; font-size: 16px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: #d8bd83; }
-  #og-green h1 { margin-top: 16px; font-family: "Newsreader", serif; font-size: 72px; font-weight: 500; line-height: .98; letter-spacing: -.03em; color: #f8f7f1; }
-  #og-green h1 span { color: #d8bd83; }
-  #og-green .lead { margin-top: 20px; font-size: 21px; line-height: 1.45; max-width: 420px; }
+  #og-green .eyebrow { margin-top: 62px; font-size: 18px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: #2f6b4f; }
+  #og-green h1 { margin-top: 14px; font-family: "Newsreader", serif; font-size: 80px; font-weight: 500; line-height: .98; letter-spacing: -.03em; color: #0e2a22; }
+  #og-green .lead { margin-top: 20px; font-size: 25px; line-height: 1.35; max-width: 470px; }
   #og-green .band {
     position: absolute; left: 0; right: 0; bottom: 0; height: 74px; z-index: 2;
     display: flex; align-items: center; gap: 40px; padding: 0 64px;
-    background: #f1efe6; color: #154d3f; font-size: 22px;
+    background: #154d3f; color: #fff; font-size: 22px;
   }
   #og-green .band .phone { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 28px; }
   #og-green .band .phone svg { width: 26px; height: 26px; }
-  #og-green .band .sep { width: 1px; height: 30px; background: #d4d8c9; }
+  #og-green .band .sep { width: 1px; height: 30px; background: rgb(255 255 255 / .3); }
 
   /* ---------- Chooser ---------- */
   #og-chooser { background: #f4f2ec; font-family: "Figtree", sans-serif; color: #16201c; }
@@ -126,7 +124,7 @@
       <span><strong>A To Z</strong><small>Home Improvement Ltd</small></span>
     </div>
     <p class="eyebrow">Local garden care</p>
-    <h1>A garden<br>you can<br><span>enjoy again.</span></h1>
+    <h1>A garden you<br>can enjoy again.</h1>
     <p class="lead">Garden maintenance, clearance and lawn care in Harrow, London.</p>
   </div>
   <div class="band">
