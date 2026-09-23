@@ -1,4 +1,4 @@
-/* A To Z (Option B): navigation, quick-contact bar and the visit form (preview only) */
+/* A To Z: navigation, quick-contact bar and the visit form (preview only) */
 
 (function () {
   "use strict";
@@ -45,7 +45,8 @@
     link.addEventListener("click", () => {
       // Focus the first field on desktop only, so phones don't pop the keyboard mid-scroll
       if (isDesktop.matches && firstField && !form.hidden) {
-        firstField.focus({ preventScroll: true });
+        // Let the anchor navigate before focusing, otherwise it takes focus back.
+        requestAnimationFrame(() => firstField.focus({ preventScroll: true }));
       }
     });
   });
