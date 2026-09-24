@@ -72,26 +72,62 @@
     bar.classList.add("is-visible");
   }
 
+  /* ---------- Project photo viewer ---------- */
+
+  const galleryLinks = Array.from(document.querySelectorAll("[data-gallery]"));
+  const lightbox = document.querySelector(".lightbox");
+  if (lightbox && typeof lightbox.showModal === "function") {
+    let photoIndex = 0;
+    let trigger = null;
+    const photo = lightbox.querySelector(".lightbox-image");
+    const caption = lightbox.querySelector(".lightbox-caption");
+    const count = lightbox.querySelector(".lightbox-count");
+    function showPhoto(index) {
+      photoIndex = (index + galleryLinks.length) % galleryLinks.length;
+      const link = galleryLinks[photoIndex];
+      photo.src = link.href;
+      photo.alt = link.querySelector("img").alt;
+      const badge = link.querySelector(".gallery-badge");
+      caption.textContent = link.dataset.caption + (badge ? " — " + badge.textContent : "");
+      count.textContent = `${photoIndex + 1} / ${galleryLinks.length}`;
+    }
+    galleryLinks.forEach((link, index) => {
+      link.addEventListener("click", event => {
+        if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        trigger = link;
+        showPhoto(index);
+        lightbox.showModal();
+        document.documentElement.classList.add("gallery-open");
+      });
+    });
+    lightbox.querySelector(".lightbox-close").addEventListener("click", () => lightbox.close());
+    lightbox.querySelector(".lightbox-prev").addEventListener("click", () => showPhoto(photoIndex - 1));
+    lightbox.querySelector(".lightbox-next").addEventListener("click", () => showPhoto(photoIndex + 1));
+    lightbox.addEventListener("keydown", event => {
+      if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        event.preventDefault();
+        showPhoto(photoIndex + (event.key === "ArrowRight" ? 1 : -1));
+      }
+    });
+    lightbox.addEventListener("click", event => {
+      if (event.target !== lightbox) return;
+      const bounds = lightbox.getBoundingClientRect();
+      if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) lightbox.close();
+    });
+    lightbox.addEventListener("close", () => {
+      document.documentElement.classList.remove("gallery-open");
+      if (trigger) trigger.focus({ preventScroll: true });
+    });
+  }
+
   /* ---------- Visit form ---------- */
 
   if (!form) return;
 
   const configuredKey = window.ATOZ_CONTACT && window.ATOZ_CONTACT.accessKey;
   const accessKey = typeof configuredKey === "string" ? configuredKey.trim() : "";
-  // Keep direct contact available when the service hasn't been configured.
-  if (!accessKey || !/^[\da-f]{8}-(?:[\da-f]{4}-){3}[\da-f]{12}$/i.test(accessKey)) return;
-
-  form.elements.access_key.value = accessKey;
-  form.hidden = false;
-  form.parentElement.querySelector(".contact-fallback").hidden = true;
-
-  const captchaScript = document.createElement("script");
-  captchaScript.src = "https://web3forms.com/client/script.js";
-  captchaScript.async = true;
-  captchaScript.onerror = () => {
-    showError("The security check could not load. Please call 07424 940579 or email us to arrange a visit.");
-  };
-  document.body.appendChild(captchaScript);
+  const isConfigured = /^[\da-f]{8}-(?:[\da-f]{4}-){3}[\da-f]{12}$/i.test(accessKey);
 
   const messages = {
     name: "Please enter your name.",
@@ -103,7 +139,7 @@
   function validate(field) {
     const wrap = field.closest(".field");
     const error = wrap.querySelector(".field-error");
-    if (field.tagName === "INPUT" && !field.value.trim()) field.value = ""; // whitespace-only counts as empty
+    if ((field.tagName === "INPUT" || field.tagName === "TEXTAREA") && !field.value.trim()) field.value = "";
     if (field.name === "postcode") field.value = field.value.trim().toUpperCase().replace(/\s+/g, " ");
     if (field.name === "phone") {
       field.value = field.value.trim();
@@ -117,7 +153,7 @@
     return ok;
   }
 
-  const fields = Array.from(form.querySelectorAll(".field input, .field select"));
+  const fields = Array.from(form.querySelectorAll(".field input, .field select, .field textarea"));
 
   fields.forEach((field) => {
     const error = field.closest(".field").querySelector(".field-error");
@@ -143,9 +179,32 @@
     formError.hidden = false;
   }
 
+  // Keep every field visible. Only enable sending after a valid form key exists.
+  if (isConfigured) {
+    form.action = "https://api.web3forms.com/submit";
+    form.elements.access_key.value = accessKey;
+    submitButton.disabled = false;
+    form.querySelector(".contact-fallback").hidden = true;
+    form.querySelector(".captcha-field").hidden = false;
+    form.querySelector("[data-confirmation-note]").hidden = false;
+    form.removeAttribute("aria-describedby");
+    const captchaScript = document.createElement("script");
+    captchaScript.src = "https://web3forms.com/client/script.js";
+    captchaScript.async = true;
+    captchaScript.onerror = () => {
+      showError("The security check could not load. Please call 07424 940579 or email us to arrange a visit.");
+    };
+    document.body.appendChild(captchaScript);
+  }
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (submitting) return;
+    if (!isConfigured) {
+      showError("Online requests are not available yet. Please call 07424 940579 or email Nicolae to arrange a visit.");
+      formError.focus();
+      return;
+    }
     formError.hidden = true;
     captchaError.hidden = true;
     const invalid = fields.filter((field) => !validate(field));
@@ -191,6 +250,7 @@
       form.reset();
       form.hidden = true;
       form.parentElement.querySelector(".visit-title").hidden = true;
+      form.parentElement.querySelector(".visit-intro").hidden = true;
       success.hidden = false;
       success.focus();
     } catch {

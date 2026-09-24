@@ -61,6 +61,7 @@ async function fillForm(page, { token = true } = {}) {
   await page.locator('#v-phone').fill('+44 (7424) 940579');
   await page.locator('#v-postcode').fill('nw10 1aa');
   await page.locator('#v-service').selectOption({ label: 'Garden maintenance' });
+  await page.locator('#v-message').fill('Please tidy the lawn and borders.');
   if (token) await page.locator('[name="h-captcha-response"]').evaluate(el => { el.value = 'test-token'; });
 }
 async function assertNoOverflow(page) {
@@ -128,10 +129,20 @@ for (const width of [320, 390, 768, 900, 1440]) {
   });
 }
 
-test('unconfigured and no-JavaScript states offer direct contact without accepting form data', async t => {
+test('unconfigured and no-JavaScript states show all editable fields and disable sending', async t => {
   for (const javaScriptEnabled of [true, false]) {
     const page = await pageFor(t, { javaScriptEnabled, width: 390 });
-    assert.equal(await page.locator('.visit-form').isVisible(), false);
+    assert.equal(await page.locator('.visit-form').isVisible(), true);
+    assert.equal(await page.locator('[type="submit"]').isDisabled(), true);
+    assert.equal(await page.locator('.captcha-field').isVisible(), false);
+    for (const field of ['#v-name', '#v-phone', '#v-postcode', '#v-service', '#v-message']) {
+      assert.equal(await page.locator(field).isVisible(), true);
+      assert.equal(await page.locator(field).isEditable(), true);
+    }
+    await page.locator('#v-name').fill('Customer');
+    await page.locator('#v-message').fill('A garden tidy-up.');
+    await page.locator('#v-name').press('Enter');
+    assert.equal(new URL(page.url()).pathname, '/');
     assert.equal(await page.locator('.contact-fallback').isVisible(), true);
     assert.equal(await page.locator('.form-success').isVisible(), false);
     assert.equal(await page.locator('.contact-fallback a[href^="mailto:"]').isVisible(), true);
@@ -157,8 +168,12 @@ test('missing or invalid form configuration keeps direct contact working', async
   ]) {
     await page.route('**/green/config.js', route => route.fulfill({ contentType: 'text/javascript', body }));
     await page.reload();
-    assert.equal(await page.locator('.visit-form').isVisible(), false);
+    assert.equal(await page.locator('.visit-form').isVisible(), true);
+    assert.equal(await page.locator('[type="submit"]').isDisabled(), true);
     assert.equal(await page.locator('.contact-fallback').isVisible(), true);
+    await page.locator('.visit-form').evaluate(el => el.dispatchEvent(new Event('submit', { cancelable: true })));
+    assert.equal(await page.locator('.form-error').isVisible(), true);
+    assert.equal(await page.locator('.form-success').isVisible(), false);
     await page.locator('.nav-toggle').click();
     assert.equal(await page.locator('.nav-toggle').getAttribute('aria-expanded'), 'true');
     await page.unroute('**/green/config.js');
@@ -169,11 +184,13 @@ test('missing or invalid form configuration keeps direct contact working', async
   assert.equal(providerRequests, 0);
 });
 
-test('desktop booking links focus the name field when the form is activated', async t => {
-  const page = await pageFor(t, { configured: true });
-  await page.locator('.nav-cta').click();
-  await page.waitForFunction(() => document.activeElement.id === 'v-name');
-  assert.equal(new URL(page.url()).hash, '#contact');
+test('desktop booking links focus the visible name field in both configuration states', async t => {
+  for (const configured of [false, true]) {
+    const page = await pageFor(t, { configured });
+    await page.locator('.nav-cta').click();
+    await page.waitForFunction(() => document.activeElement.id === 'v-name');
+    assert.equal(new URL(page.url()).hash, '#contact');
+  }
 });
 
 test('configured form validates input, security check and blocks the honeypot', async t => {
@@ -215,6 +232,7 @@ test('confirmed API success sends correct fields once and focuses confirmation',
   assert.equal(payload.name, 'Test Gardener');
   assert.equal(payload.postcode, 'NW10 1AA');
   assert.equal(payload.service, 'Garden maintenance');
+  assert.equal(payload.message, 'Please tidy the lawn and borders.');
   assert.equal(payload['h-captcha-response'], 'test-token');
   assert.equal(payload.botcheck, false);
   finish();
@@ -240,6 +258,7 @@ for (const failure of ['rejection', 'rate-limit', 'server', 'bad-json', 'network
     await page.locator('.form-error').waitFor({ state: 'visible' });
     assert.equal(await page.locator('#v-name').inputValue(), 'Test Gardener');
     assert.equal(await page.locator('#v-phone').inputValue(), '+44 (7424) 940579');
+    assert.equal(await page.locator('#v-message').inputValue(), 'Please tidy the lawn and borders.');
     assert.equal(await page.locator('.form-success').isVisible(), false);
     assert.equal(await page.locator('[type="submit"]').isDisabled(), false);
     assert.equal(await page.locator('.form-error').evaluate(el => el === document.activeElement), true);
@@ -274,21 +293,62 @@ test('retired demo documents redirect to homepage and preserve anchors', async t
 
 test('privacy page is readable, linked and accessible', async t => {
   const page = await pageFor(t, { width: 390 });
-  await page.locator('.credit a').click();
+  await page.locator('.footer-bottom-links a[href="privacy.html"]').click();
   assert.equal(new URL(page.url()).pathname, '/privacy.html');
   assert.equal(await page.locator('h1').textContent(), 'Privacy notice');
   await assertNoOverflow(page);
   await assertAccessible(page);
 });
 
-test('gallery scrolls with the keyboard and reduced motion is respected', async t => {
+test('six project photos load; viewer supports keyboard navigation and restores focus', async t => {
   const page = await pageFor(t, { width: 390 });
-  await page.locator('.gallery').focus();
+  assert.equal(await page.locator('[data-gallery]').count(), 6);
+  assert.equal(await page.locator('.gallery-badge').count(), 2);
+  for (const image of await page.locator('.gallery img').all()) {
+    await image.scrollIntoViewIfNeeded();
+    await image.evaluate(el => el.decode());
+    assert.ok(await image.evaluate(el => el.naturalWidth > 0));
+  }
+  const first = page.locator('[data-gallery]').first();
+  await first.focus();
+  await page.keyboard.press('Enter');
+  assert.equal(await page.locator('.lightbox').isVisible(), true);
+  assert.equal(await page.locator('.lightbox-count').textContent(), '1 / 6');
+  await page.locator('.lightbox-image').evaluate(el => el.decode());
+  await assertAccessible(page);
+  await assertNoOverflow(page);
   await page.keyboard.press('ArrowRight');
-  await page.waitForFunction(() => document.querySelector('.gallery').scrollLeft > 0);
+  assert.equal(await page.locator('.lightbox-count').textContent(), '2 / 6');
+  await page.keyboard.press('ArrowLeft');
+  await page.keyboard.press('ArrowLeft');
+  assert.equal(await page.locator('.lightbox-count').textContent(), '6 / 6');
+  assert.match(await page.locator('.lightbox-caption').textContent(), /Before clearance/);
+  await page.locator('.lightbox-next').click();
+  assert.equal(await page.locator('.lightbox-count').textContent(), '1 / 6');
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('.lightbox').isVisible(), false);
+  await page.waitForFunction(() => !document.documentElement.classList.contains('gallery-open'));
+  assert.equal(await first.evaluate(el => el === document.activeElement), true);
+  assert.equal(await page.evaluate(() => document.documentElement.classList.contains('gallery-open')), false);
+  await first.click();
+  await page.locator('.lightbox-close').click();
+  assert.equal(await first.evaluate(el => el === document.activeElement), true);
   assert.equal(await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior), 'auto');
   await page.locator('.hero').scrollIntoViewIfNeeded();
   await page.waitForFunction(() => document.querySelector('.mobile-bar').inert);
+});
+
+test('gallery images stay available without JavaScript and footer has complete contact details', async t => {
+  const page = await pageFor(t, { javaScriptEnabled: false, width: 390 });
+  const first = page.locator('[data-gallery]').first();
+  const target = await first.getAttribute('href');
+  await first.click();
+  assert.equal(new URL(page.url()).pathname, '/' + target);
+  await page.goBack();
+  assert.match(await page.locator('.footer').innerText(), /07424\s+940579/);
+  assert.match(await page.locator('.footer').innerText(), /Open every day\s+8am–6pm/);
+  assert.equal(await page.locator('.footer-nav a').count(), 4);
+  assert.equal(await page.locator('.footer-email').getAttribute('href'), 'mailto:Atozhomeimprovementuk@gmail.com');
 });
 
 test('social image is rendered from the updated HTML source', async t => {

@@ -33,13 +33,13 @@ All external requests are intercepted in the automated suite. Web3Forms and hCap
 
 ## Contact form: Web3Forms
 
-Integration code is ready in `green/script.js`. The client has deferred supplying the access key. No key is currently configured, so the site displays usable telephone and email links instead of collecting unsent enquiries. It does the same with JavaScript disabled or unavailable. A missing or invalid configuration also leaves direct contact available and makes no requests to Web3Forms or hCaptcha.
+Integration code is ready in `green/script.js`. The client has deferred supplying the access key. All five fields stay visible and editable: name, phone, postcode, service and optional job details. Sending remains disabled until a valid key is configured, with telephone and email links beside an availability notice. The same fields and direct links are available without JavaScript. A missing or invalid configuration makes no requests to Web3Forms or hCaptcha and never shows a sent confirmation.
 
 1. Create a form at https://app.web3forms.com/ and verify the receiving address `Atozhomeimprovementuk@gmail.com`.
 2. Set `accessKey` in `green/config.js` to that form's access key. This is a public form identifier, not a mailbox password or secret server key.
 3. Enable **hCaptcha** in the Web3Forms dashboard for the form. The client loads the provider's free hCaptcha integration only when configured. Server-side CAPTCHA enforcement must be enabled in the dashboard; browser validation alone is not spam protection.
 4. Review provider settings (including retention) and the privacy notice with the business before activating collection. The notice describes Web3Forms' published default retention; amend it if settings or business handling change.
-5. Deploy and submit an authorised test enquiry. Confirm it arrives in the business inbox, including the telephone, postcode and selected service. Check junk/spam too.
+5. Deploy and submit an authorised test enquiry. Confirm it arrives in the business inbox, including the telephone, postcode, selected service and optional job details. Check junk/spam too.
 
 The form only shows confirmation after a successful HTTP response with `success: true`. It prevents double submits while waiting, times out after 20 seconds, preserves fields on failure, and offers direct contact when delivery cannot be confirmed. It never retries automatically.
 
@@ -53,7 +53,7 @@ Provider documentation: [API](https://docs.web3forms.com/getting-started/api-ref
 - `robots.txt`, `sitemap.xml`: crawl permissions and canonical pages for launch.
 - `vercel.json`: permanent HTTP redirects from `/index.html`, `/green`, `/green/`, `/green/index.html`, `/navy`, `/navy/` and `/navy/index.html` to `/`. Shared files under `/green/` are not redirected.
 - `green/index.html`, `navy/index.html`: minimal redirect documents for local/non-Vercel hosting. These have no duplicate page content and preserve URL fragments in JavaScript.
-- `assets/img/`: the supplied hero artwork, optimised sizes and existing Checkatrade project photos. The independently supplied `logo.jpeg` has not been changed.
+- `assets/img/`: the supplied hero artwork, optimised sizes and six lightly enhanced Checkatrade project photos. The gallery opens a native dialog with previous/next, keyboard navigation, Escape to close and restored focus. Without JavaScript, links open the full photo. Enhancement prompt and source mapping: [gallery notes](docs/gallery/README.md). The independently supplied `logo.jpeg` has not been changed.
 - `docs/og/og-images.html`: editable social-image source. The selected 1200×630 image is `green/og-image.jpg` and uses `?v=5` in the homepage.
 
 The homepage and privacy page permit indexing. Retired redirect documents use `noindex, follow`. Changes become live only after deployment; verify the production host does not impose an additional `X-Robots-Tag: noindex` header. The domain is intentionally unchanged. If it changes later, update canonical/schema/OG URLs, `robots.txt` and `sitemap.xml` together.
