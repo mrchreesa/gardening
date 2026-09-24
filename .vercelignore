@@ -2,5 +2,11 @@
 .DS_Store
 docs
 README.md
+node_modules
+tests
+package.json
+package-lock.json
+/navy/script.js
+/navy/styles.css
 /5999d53f-02cc-416d-a882-7aaf3a508160.png
 /dc847c6d-42a4-4388-bded-efce89d21a95.png

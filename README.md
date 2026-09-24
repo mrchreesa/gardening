@@ -1,60 +1,68 @@
-# A To Z Home Improvement: garden care landing page
+# A To Z Home Improvement: garden care website
 
-The selected green-and-cream landing page (HTML/CSS/JS, no build step) for Nicolae Chiric, A To Z Home Improvement Ltd, garden care in Harrow. The homepage keeps the original green-and-cream design, with the supplied London artwork replacing the hero photo.
+Static HTML/CSS/JavaScript website for A To Z Home Improvement Ltd. The selected green-and-cream design is served at `/`; no production framework or build step is required.
 
-Live preview: https://atoz-home-improvementl.vercel.app (Vercel deploys every push to `main`)
+Current canonical address: https://atoz-home-improvementl.vercel.app (existing Vercel deployment; pushes to `main` deploy automatically).
 
-Run locally: `python3 -m http.server 8790` and open http://localhost:8790
+## Confirmed content
 
-## Files
+- The existing 16 gardening services, free estimates, domestic/commercial work and card payments are confirmed by the client.
+- Business identity stays as previously supplied: A To Z Home Improvement Ltd.
+- Coverage: North West London. The directory lists neighbourhoods within NW1–NW11 and HA0–HA9, including the existing Harrow service area.
+- Telephone: 07424 940579; email: Atozhomeimprovementuk@gmail.com.
+- Open every day, 08:00–18:00 (UK local time).
+- No personal About section, testimonials or unverified insurance claims.
 
-- `index.html`: the selected green landing page, served at `/`.
-- `green/`: shared `styles.css` (design tokens in `:root`), `script.js` (menu, mobile call bar and preview form), favicon, home-screen icon and sharing image. `/green/` also serves the selected design for existing preview links, with `/` as its canonical URL. Keep its HTML in sync with the root page; only relative asset paths differ.
-- `navy/`: the original navy-and-orange preview, retained at `/navy/`.
-- `assets/img/`: shared images. `hero.png` is the supplied hero artwork; `hero-640.webp`, `hero-1024.webp` and `hero-1536.webp` are optimised, uncropped versions used by the green landing page. `preview-*` and `og-image.jpg` are legacy chooser assets.
-- `assets/fonts/`: self-hosted Latin woff2 files: Figtree variable (navy), Newsreader 500 and DM Sans variable (green)
-- `docs/superpowers/specs/`: the short design spec
-- `docs/og/og-images.html`: editable source for the three sharing images and the two home-screen icons
+The geographical interpretation used for the directory is the NW postal districts plus the HA districts around Harrow. Neighbourhood boundaries overlap postcode boundaries. NW1W and NW26 are PO-box districts, not service locations. Sources checked on 24 September 2026: [NW districts](https://en.wikipedia.org/wiki/NW_postcode_area) and [HA districts](https://en.wikipedia.org/wiki/HA_postcode_area).
 
-The root landing page and `/green/` share their CSS and JavaScript. The navy preview remains independent.
+## Local development and checks
 
-## Photos
+Serve: `python3 -m http.server 8790`, then open http://localhost:8790.
 
-The garden project photos are Nicolae's own, from his Checkatrade profile (https://www.checkatrade.com/trades/atozhomeimprovementlimited). They were cropped, lightly softened to cut phone-camera noise, and exported as WebP at several widths. The new London hero artwork was supplied separately in `assets/img/hero.png`.
+Browser checks (development tools only):
 
-- `hero-lawn-*`: mown back lawn with shed. Retained for the navy preview.
-- `work-lawn-*`, `work-tidy-up-*`, `work-side-path-*`: the "Our work" gallery
+```
+npm ci
+npx playwright install chromium
+npm test
+```
 
-The profile has more garden photos (including before shots of the overgrown garden) and some door and interior jobs that aren't used here. It also shows logos of *other* companies from Checkatrade's "similar trades" panel; don't use those.
+The tests start an isolated local HTTP server. They check 320, 390, 768, 900 and 1440px layouts; keyboard navigation; automated WCAG A/AA checks with axe; contact targets; postcode coverage; metadata; local asset links; retired-page fallback redirects; and form validation, success, rejection, network failure, rate limits, duplicate submits, CAPTCHA failure and timeout states. Screenshots are written to `/tmp/atoz-launch-qa`.
 
-## Confirm with the client before launch
+All external requests are intercepted in the automated suite. Web3Forms and hCaptcha responses are simulated: no test messages are sent. Browser automation and axe are not a complete manual accessibility audit. Vercel's actual HTTP redirects and actual email delivery must be checked on the deployed site.
 
-- Reviews: Checkatrade shows 0 reviews (he joined in September 2026), so neither design has ratings or testimonials. Add them once he has some.
-- Area covered: the pages only say Harrow, London
-- Business details: the Ltd company name, and whether "Free estimates", "Domestic & commercial" and "Cards accepted" (from Checkatrade) are all still true
-- The navigation says "Services / Our work / Contact". There is no About content yet. Add an about section if he wants one.
-- Public liability insurance: Checkatrade lists it as unverified. Worth mentioning on the site once confirmed.
+## Contact form: Web3Forms
 
-## Sharing previews (WhatsApp, Facebook, iMessage)
+Integration code is ready in `green/script.js`. The client has deferred supplying the access key. No key is currently configured, so the site displays usable telephone and email links instead of collecting unsent enquiries. It does the same with JavaScript disabled or unavailable. A missing or invalid configuration also leaves direct contact available and makes no requests to Web3Forms or hCaptcha.
 
-The pages have 1200×630 sharing images and full Open Graph and Twitter tags with absolute URLs:
+1. Create a form at https://app.web3forms.com/ and verify the receiving address `Atozhomeimprovementuk@gmail.com`.
+2. Set `accessKey` in `green/config.js` to that form's access key. This is a public form identifier, not a mailbox password or secret server key.
+3. Enable **hCaptcha** in the Web3Forms dashboard for the form. The client loads the provider's free hCaptcha integration only when configured. Server-side CAPTCHA enforcement must be enabled in the dashboard; browser validation alone is not spam protection.
+4. Review provider settings (including retention) and the privacy notice with the business before activating collection. The notice describes Web3Forms' published default retention; amend it if settings or business handling change.
+5. Deploy and submit an authorised test enquiry. Confirm it arrives in the business inbox, including the telephone, postcode and selected service. Check junk/spam too.
 
-| Link | Image | Shows |
-|---|---|---|
-| `/` | `green/og-image.jpg` | Green design with the supplied London artwork, headline and phone number |
-| `/navy/` | `navy/og-image.jpg` | Option A: headline, logo and phone number over the hero photo |
-| `/green/` | `green/og-image.jpg` | Same selected design as `/` |
+The form only shows confirmation after a successful HTTP response with `success: true`. It prevents double submits while waiting, times out after 20 seconds, preserves fields on failure, and offers direct contact when delivery cannot be confirmed. It never retries automatically.
 
-- The images are designed in `docs/og/og-images.html` using the real fonts and logos. To change one, edit that page, serve the project root, screenshot each `[data-out]` element at 1200×630 (icons at 180×180), and save it as JPEG (quality ~84) to the path in its `data-out` attribute. Keep each image under 300 KB so WhatsApp shows it.
-- The selected design's image URLs end in `?v=4`; the navy preview uses `?v=2`. WhatsApp caches previews per URL, so after changing an image, bump the number in the pages using it.
-- All URLs use `https://atoz-home-improvementl.vercel.app`. If the site moves to a custom domain, find and replace that address across the three `index.html` files.
+Provider documentation: [API](https://docs.web3forms.com/getting-started/api-reference), [hCaptcha setup](https://docs.web3forms.com/getting-started/customizations/spam-protection/hcaptcha), [privacy](https://web3forms.com/privacy).
 
-## Before launch
+## Files and routing
 
-- `robots` is set to `noindex, nofollow` on every page. Remove it from the chosen design at launch.
-- `.vercelignore` keeps the mockup PNGs, docs and README out of the deployment.
+- `index.html`: homepage, contact information, service directory, work gallery and coverage lists.
+- `green/styles.css`, `green/script.js`, `green/config.js`: styles, interactions, form integration and public form configuration.
+- `privacy.html`: enquiry privacy notice.
+- `robots.txt`, `sitemap.xml`: crawl permissions and canonical pages for launch.
+- `vercel.json`: permanent HTTP redirects from `/index.html`, `/green`, `/green/`, `/green/index.html`, `/navy`, `/navy/` and `/navy/index.html` to `/`. Shared files under `/green/` are not redirected.
+- `green/index.html`, `navy/index.html`: minimal redirect documents for local/non-Vercel hosting. These have no duplicate page content and preserve URL fragments in JavaScript.
+- `assets/img/`: the supplied hero artwork, optimised sizes and existing Checkatrade project photos. The independently supplied `logo.jpeg` has not been changed.
+- `docs/og/og-images.html`: editable social-image source. The selected 1200×630 image is `green/og-image.jpg` and uses `?v=5` in the homepage.
 
-## Not done yet (after sign-up)
+The homepage and privacy page permit indexing. Retired redirect documents use `noindex, follow`. Changes become live only after deployment; verify the production host does not impose an additional `X-Robots-Tag: noindex` header. The domain is intentionally unchanged. If it changes later, update canonical/schema/OG URLs, `robots.txt` and `sitemap.xml` together.
 
-- The forms only validate and show a "preview" message; nothing is sent. Connect them to email (Formspree, Web3Forms or a small serverless function).
-- LocalBusiness structured data has no postcode yet. Add it when his address is confirmed.
+## Remaining launch dependencies
+
+The site can be deployed with telephone/email enquiries while the online form is deferred. The blank key is intentional and does not prevent the other pages or navigation from working.
+
+- On deployment: verify production redirects, crawlability and contact links.
+- When the client supplies the key: complete Web3Forms account verification, dashboard CAPTCHA enforcement and a real delivery check. Review provider retention settings and the privacy notice against the business's enquiry handling before activating form collection.
+
+The requested company identity is retained unchanged. This update does not independently verify or supplement company registration disclosures.
